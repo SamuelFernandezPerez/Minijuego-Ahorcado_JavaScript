@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+
+<style>
+@font-face {
+	font-family: 'mifuente';
+	src: url('a.ttf');
+}
+
+
+body {
+	font-family: 'mifuente';
+	text-align: center;
+	font-size: 2rem;
+	
+}
+
+.victoria {
+	position: absolute;
+	padding-top: 50px;
+	top: 00px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	
+}
+.puntuacion {
+	position: absolute;
+	top: 200px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+}
+
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+</head>
+<body>
+
+<div class="w-100 h-screen bg-black flex justify-center items-center bg-[conic-gradient(at_left,_var(--tw-gradient-stops))] from-gray-900 to-gray-600 bg-gradient-to-r">
+	<div class="w-[50%] h-[40rem] bg-white grid place-items-center  border-8 border-sky-500">
+		<div id="mensaje">Adivina la siguiente frase</div>
+			<div id="frase_a_mostrar" style="margin: 10px;"></div>
+		<div>
+		<button id="adivinar" type="button" class="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-lg shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 ">Adivinar Frase</button>
+		<button id="desvelar" type="button" class="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">Desvelar letra</button>
+		</div>
+
+		<div id="victoria" class="victoria text-purple-500"><p>¡Felicidades maquina!</p></div>
+		<div id="puntuacion">Puntuación: 100</div>
+		<div id="puntuacionFinal" class="puntuacion text-teal-500">Puntuación: 100</div>
+	</div>
+</div>
+
+
+
+	
+
+
+	<script src="js/jquery.js"></script>
+	<script src="js/jquery_color.js"></script>
+	<script>
+		let puntos = 100;
+		let frases_procesadas = [];
+		let frase_a_adivinar = "";
+		let contador = 0;
+		let frase_a_mostrar = "";
+		let reg_exp_letras = /[a-zÃ±Ã¡Ã©Ã­Ã³Ãº]/i;//elemento que vale para comprobar que un valor, sean solo letras
+		let reg_exp_consonantes = /[aeiouÃ¡Ã©Ã­Ã³Ãº]/i;//consonantes
+
+		$("#mensaje").animate({
+			fontSize : "2em",
+			padding : "10px"
+		});
+
+		//preparar la frase a mostrar
+		function preparar_frase() {
+			frase_a_adivinar = frases_procesadas[Math.floor(Math.random()
+					* frases_procesadas.length)];
+			frase_a_mostrar = "";
+			//los string en javascript se pueden tratar como arrays de caracteres
+			for (i in frase_a_adivinar) {
+				if (frase_a_adivinar[i] != " ") {
+					frase_a_mostrar += "_";
+				} else {
+					frase_a_mostrar += " ";
+				}
+			}//end for
+			$("#frase_a_mostrar").html(frase_a_mostrar);
+			console.log("adivinar: " + frase_a_adivinar);
+		}//end preparar_frase
+
+		$("#adivinar").click(
+				function() {
+					let introducido = prompt("introduce la frase:");
+					if (introducido.toUpperCase() == frase_a_adivinar
+							.toUpperCase()) {
+						contador++;
+						if (contador == 3) {
+							alert("ya has adivinado todas, felicidades");
+							mostrar_victoria();
+						} else {
+							alert("felicidades adivinaste la frase numero: "
+									+ contador);
+							preparar_frase();
+						}
+					} else {
+						alert("lo siento, fallaste");
+						puntos = puntos - 20;
+						document.getElementById("puntuacion").innerHTML = "<p>Puntuación: " + puntos + "</p>";
+						 
+					}
+				});//end click adivinar
+
+		$("#desvelar").click(function() {
+
+			let letra = prompt("introduce una letra").toUpperCase();
+
+			if (!reg_exp_letras.test(letra)) {
+				alert("no has introducido una letra");
+				return;
+			}
+
+			//puedo usar directamente strings como arrays a la hora 
+			//de acceder a las letras, pero para modificarlas no se puede
+			let array_frase_a_mostrar = frase_a_mostrar.split("");
+			for (i in frase_a_adivinar) {
+				
+				if (frase_a_adivinar[i].toUpperCase() == letra) {
+					array_frase_a_mostrar[i] = frase_a_adivinar[i];
+				}
+				
+			}
+			frase_a_mostrar = array_frase_a_mostrar.join("");//array a string
+			$("#frase_a_mostrar").html(frase_a_mostrar);
+			if(letra == "A" || letra == "E" || letra == "I" || letra == "O" || letra == "U" ){
+				puntos = puntos - 10;
+				document.getElementById("puntuacion").innerHTML = "<p>Puntuación: " + puntos + "</p>";
+			}else{
+				puntos = puntos - 5;
+				document.getElementById("puntuacion").innerHTML = "<p>Puntuación: " + puntos + "</p>";
+			}
+			
+			
+		});//end click desvelar
+
+		function mostrar_victoria() {
+			document.getElementById("puntuacionFinal").innerHTML = "<p>Puntuación final: " + puntos + "</p>";
+			$("#puntuacionFinal").show();
+			
+			$("#puntuacionFinal").animate({
+				fontSize : "1.65em",
+			}, 1500);
+			$("#victoria").show();
+			$("#victoria").animate({
+				fontSize : "2em",
+			}, 1500);
+		}//end mostrar_victoria
+
+
+		$.get("textos/frases.txt", function(res) {
+			let frases = res.split("\r\n");
+			for (i in frases) {
+				let f = frases[i];
+				if (f.trim() != "") {
+					try {
+						f = f.split("(")[0];
+						if (f.includes(".")) {
+							f = f.split(".")[0];
+						}
+						f = f.trim();
+						frases_procesadas.push(f);
+					} catch (error) {
+						console.log(f + " ignorada");
+					}
+				}
+			}//end for in
+			console.log(frases_procesadas);
+			preparar_frase();
+		});//carga de los textos
+
+		$("#victoria").hide();
+		$("#puntuacionFinal").hide();
+	</script>
+
+</body>
+</html>
+
+
+
